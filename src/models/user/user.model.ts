@@ -6,6 +6,7 @@ export interface IUser {
   email: string;
   password?: string;
   role?: string;
+  status?: 'active' | 'inactive' | 'suspended' | 'pending';
   createdAt?: Date;
   updatedAt?: Date;
 }

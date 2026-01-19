@@ -6,6 +6,7 @@ import { verifyToken } from "./middlewares/auth.middleware";
 import { errorHandler } from "./middlewares/error.middleware";
 import userRoutes from "./models/user/user.routes";
 import productRoutes from "./models/products/product.routes";
+import serviceRoutes from "./models/services/service.routes";
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.post("/api/logout", (req, res) => {
 // Add your routes here
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/services", serviceRoutes);
 
 
 app.use(errorHandler);
