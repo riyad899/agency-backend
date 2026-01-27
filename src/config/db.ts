@@ -1,6 +1,6 @@
 import { MongoClient, Db } from "mongodb";
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://riyadus300_db_user:RFV9VvmTNHcmDEcJ@cluster0.1thelew.mongodb.net/myDatabase?retryWrites=true&w=majority&appName=Cluster0';
+const MONGODB_URI = process.env.MONGODB_URI!;
 
 let db: Db | null = null;
 let client: MongoClient | null = null;
@@ -40,9 +40,4 @@ export const closeDB = async (): Promise<void> => {
     console.log("MongoDB connection closed");
   }
 };
-
-// Initialize connection on module load
-connectDB().catch((err) => {
-  console.error("Failed to initialize MongoDB connection:", err);
-});
 

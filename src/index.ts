@@ -1,9 +1,14 @@
+import dotenv from 'dotenv'
+
+// Load environment variables FIRST before any other imports
+dotenv.config()
+
 import express, { Request, Response } from 'express'
 import cors from 'cors'
-import dotenv from 'dotenv'
 import cookieParser from 'cookie-parser'
 import { verifyIdTokenMiddleware, cookieAuthMiddleware } from './firebase'
 import { connectDb } from './db'
+import { connectDB } from './config/db'
 import userRoutes from './routes/userRoutes'
 import authRoutes from './routes/authRoutes'
 import adminRoutes from './routes/adminRoutes'
@@ -14,10 +19,6 @@ import projectsRoutes from './models/projects/project.routes'
 import servicesRoutes from './models/services/service.routes'
 import teamRoutes from './models/team/team.routes'
 import userManagementRoutes from './models/user/user.routes'
-
-
-
-dotenv.config()
 
 const app = express()
 
@@ -51,8 +52,13 @@ app.use(cookieParser())
 
 const PORT = process.env.PORT || 4000
 
+// Initialize both database connections
 connectDb().catch((err) => {
-  console.error('Failed to connect to MongoDB', err)
+  console.error('Failed to connect to MongoDB (Mongoose)', err)
+})
+
+connectDB().catch((err) => {
+  console.error('Failed to connect to MongoDB (Native Driver)', err)
 })
 
 // Health check endpoint
