@@ -14,6 +14,7 @@ import servicesRoutes from '../models/services/service.routes';
 import teamRoutes from '../models/team/team.routes';
 import userManagementRoutes from '../models/user/user.routes';
 import orderRoutes from '../models/order/order.routes';
+import contactRoutes from '../models/contact/contact.routes';
 
 // Home module routes
 import bannerRoutes from '../models/Home/Banner/banner.routes';
@@ -65,6 +66,11 @@ export const registerRoutes = (app: Express) => {
   app.use('/api/banner', bannerRoutes);         // Hero banner
   app.use('/api/testimonials', testimonialRoutes); // Client testimonials
   app.use('/api/faqs', faqRoutes);              // FAQ section
+
+  // ==========================================
+  // CONTACT
+  // ==========================================
+  app.use('/api/contact', contactRoutes);       // Contact form submissions
 };
 
 /**
@@ -92,4 +98,7 @@ export const registerRoutes = (app: Express) => {
  *   - /api/banner/* - Hero banner
  *   - /api/testimonials/* - Testimonials
  *   - /api/faqs/* - FAQs
+ *
+ * Contact:
+ *   - /api/contact/* - Contact form submissions
  */
