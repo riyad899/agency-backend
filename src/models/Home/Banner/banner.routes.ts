@@ -14,7 +14,7 @@ const router = express.Router();
 router.get("/", getBanner);
 
 // Admin-only routes
-router.get("/all", verifyToken, requireAdmin, getAllBanners);
+router.get("/all", getAllBanners);
 router.post("/", verifyToken, requireAdmin, createBanner);
 router.put("/:id", verifyToken, requireAdmin, updateBanner);
 router.patch("/:id", verifyToken, requireAdmin, updateBanner);

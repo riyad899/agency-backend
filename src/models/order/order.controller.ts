@@ -32,7 +32,7 @@ export const createOrder = async (req: Request, res: Response) => {
         // Log the incoming request body for debugging
         console.log("Order request body:", JSON.stringify(req.body, null, 2));
 
-        const { customer, items, pricing, payment, notes, plan, planName, planPrice, paymentMethod, transactionId } = req.body;
+        const { customer, items, pricing, payment, notes, plan, planName, planPrice, paymentMethod, transactionId, receiverNumber } = req.body;
 
         // Validate required fields
         if (!customer || !customer.name || !customer.email || !customer.phone) {
@@ -134,6 +134,21 @@ export const createOrder = async (req: Request, res: Response) => {
             }
         }
 
+        // Validate unique transaction ID if provided
+        const finalTransactionId = payment?.transactionId || transactionId;
+        if (finalTransactionId) {
+            const existingOrder = await db.collection("orders").findOne({
+                "payment.transactionId": finalTransactionId
+            });
+
+            if (existingOrder) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid transaction ID. This transaction ID already exists."
+                });
+            }
+        }
+
         // Generate unique order number
         const orderNumber = await generateOrderNumber();
 
@@ -159,7 +174,8 @@ export const createOrder = async (req: Request, res: Response) => {
             payment: {
                 status: payment?.status || "pending",
                 method: payment?.method || paymentMethod,
-                transactionId: payment?.transactionId || transactionId
+                transactionId: payment?.transactionId || transactionId,
+                receiverNumber: payment?.receiverNumber || receiverNumber
             },
             cancellation: {
                 isCancelled: false
@@ -839,6 +855,66 @@ export const getOrderStats = async (req: Request, res: Response) => {
         return res.status(500).json({
             success: false,
             message: "Failed to get order statistics"
+        });
+    }
+};
+
+// Track orders by email (public endpoint)
+export const trackOrdersByEmail = async (req: Request, res: Response) => {
+    try {
+        const db = getDB();
+        const { email } = req.params;
+
+        // Validate email parameter
+        if (!email) {
+            return res.status(400).json({
+                success: false,
+                message: "Email parameter is required"
+            });
+        }
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email as string)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid email format"
+            });
+        }
+
+        // Find all orders with the given email
+        const orders = await db.collection("orders")
+            .find({ "customer.email": email })
+            .sort({ createdAt: -1 })
+            .toArray();
+
+        // Format the response data
+        const trackingData = orders.map((order) => ({
+            orderId: order._id,
+            orderNumber: order.orderNumber,
+            name: order.customer.name,
+            email: order.customer.email,
+            phone: order.customer.phone,
+            paymentStatus: order.payment.status,
+            paymentMethod: order.payment.method,
+            amount: order.pricing.grandTotal,
+            currency: order.pricing.currency,
+            orderDate: order.createdAt,
+            paidAt: order.payment.paidAt
+        }));
+
+        return res.status(200).json({
+            success: true,
+            message: `Found ${trackingData.length} order(s) for ${email}`,
+            count: trackingData.length,
+            data: trackingData
+        });
+    } catch (error) {
+        console.error("Track orders by email error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to track orders",
+            error: error instanceof Error ? error.message : "Unknown error"
         });
     }
 };

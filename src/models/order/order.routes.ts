@@ -10,17 +10,20 @@ import {
     cancelOrder,
     updateOrder,
     deleteOrder,
-    getOrderStats
+    getOrderStats,
+    trackOrdersByEmail
 } from "./order.controller";
 import { verifyToken, requireAdmin } from "../../middlewares/auth.middleware";
 
 const router = express.Router();
 
-// Public route - Create order (customers can place orders)
-router.post("/", createOrder);
+// Public routes
+router.post("/",verifyToken, createOrder); // Create order (customers can place orders)
+router.get("/track/:email", trackOrdersByEmail); // Track orders by email (public)
 
 // Authenticated user routes (must come before :id routes)
 router.get("/my-orders", verifyToken, getUserOrders);
+router.get("/:id/status", verifyToken, getOrderById); // Users can view their order status
 router.patch("/:id/cancel", verifyToken, cancelOrder);
 
 // Admin-only routes

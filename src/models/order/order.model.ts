@@ -11,8 +11,9 @@ export interface OrderPricing {
 
 export interface OrderPayment {
     status: "pending" | "paid" | "failed" | "refunded";
-    method?: string; // e.g., "credit_card", "bkash", "nagad", "cash"
+    method?: string;
     transactionId?: string;
+    receiverNumber?: string;
     paidAt?: Date;
 }
 

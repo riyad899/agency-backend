@@ -5,6 +5,7 @@ import adminRoutes from './adminRoutes';
 import authRoutes from './authRoutes';
 import productRoutes from './productRoutes';
 import userRoutes from './userRoutes';
+import dashboardRoutes from './dashboardRoutes';
 
 // Module routes
 import pricingRoutes from '../models/pricing/pricing.routes';
@@ -31,6 +32,7 @@ export const registerRoutes = (app: Express) => {
   // ==========================================
   app.use('/api', adminRoutes);           // Admin operations
   app.use('/api', authRoutes);            // Auth: register, login, logout, profile, me
+  app.use('/api/dashboard', dashboardRoutes); // Dashboard statistics
 
   // ==========================================
   // USER MANAGEMENT
